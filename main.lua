@@ -69,34 +69,6 @@ function ToggleMessages(Split, Player)
 	return true
 end
 
-function OnPlayerMoving(Player)
-
-	local world = Player:GetWorld():GetName()
-	local playerx = Player:GetPosX()
-	local playery = Player:GetPosY()
-	local playerz = Player:GetPosZ()
-	local name = Player:GetName()
-	
-	if PLAYERLOCATIONS[name] ~= nil then
-		if not IsInSpawn(PLAYERLOCATIONS[name]["x"], PLAYERLOCATIONS[name]["y"], PLAYERLOCATIONS[name]["z"], PLAYERLOCATIONS[name]["world"]) then
-			if IsInSpawn(playerx, playery, playerz, world) then
-				if MESSAGE[Player:GetName()] ~= false then
-					SendMessage(Player, "You have entered spawn!")
-				end
-			end
-		else
-			if not IsInSpawn(playerx, playery, playerz, world) then
-				if MESSAGE[Player:GetName()] ~= false then
-					SendMessage(Player, "You have exited spawn!")
-				end
-			end
-		end
-	end
-
-	PLAYERLOCATIONS[name] = {x = playerx, y = playery, z = playerz, world = world}
-
-end
-
 function IsInSpawn(x, y, z, worldName)
 	
 	-- Get Spawn Coordinates for the World
