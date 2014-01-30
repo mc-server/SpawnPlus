@@ -44,6 +44,8 @@ function Initialize( Plugin )
 
 	-- Hooks
         cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
+        cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
+        cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_PLACING_BLOCK, OnPlayerPlacingBlock)
 
 	-- Commands
 	if ALLOWMESSAGETOGGLE then
