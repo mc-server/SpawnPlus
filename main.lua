@@ -22,14 +22,20 @@
 
 -- Configuration
 
+-- Show messages upon entering and exiting spawn by default?
+SPAWNMESSAGE = false
+-- Allow players to toggle entry and exit messages?
 ALLOWMESSAGETOGGLE = true
+-- Radius to protect in. Set to nil to disable.
+PROTECTIONRADIUS = 10
+
 
 -- Globals
 
 PLUGIN = {}
 LOGPREFIX = ""
 PLAYERLOCATIONS = {}
-MESSAGE = {}
+WORLDSPAWNPROTECTION = {}
 
 -- Plugin Start
 
@@ -51,9 +57,20 @@ function Initialize( Plugin )
 	if ALLOWMESSAGETOGGLE then
 	        cPluginManager.BindCommand("/togglespawnmessage", "spawnplus.togglemessage", ToggleMessages, " - Toggle the message upon entering and leaving spawn.")
 	end
+	
+	-- Load the world spawn protection values fron the INI file.
+	cRoot:Get():ForEachWorld(
+        	function (world)
+			local WorldIni = cIniFile()
+			WorldIni:ReadFile(world:GetIniFileName())
+			WORLDSPAWNPROTECTION[world:GetName()]   = WorldIni:GetValueSetI("SpawnProtect", "ProtectRadius", 10)
+			WorldIni:WriteFile(world:GetIniFileName())
+		end
+        )
 
 	LOG( LOGPREFIX .. "Plugin v" .. Plugin:GetVersion() .. " Enabled!" )
         return true
+        
 end
 
 function OnDisable()
@@ -79,8 +96,8 @@ function IsInSpawn(x, y, z, worldName)
 	local spawny = world:GetSpawnY()
 	local spawnz = world:GetSpawnZ()
 	
-	-- Get protection radius from the Core plugin.
-	local protectRadius = cPluginManager:CallPlugin("Core", "getSpawnProtectRadius", worldName)
+	-- Get protection radius for the world.
+	local protectRadius = GetSpawnProtection(worldName)
 	
 	-- Check if the specified coords are in the spawn.
 	if not ((x <= (spawnx + protectRadius)) and (x >= (spawnx - protectRadius))) then
@@ -96,4 +113,8 @@ function IsInSpawn(x, y, z, worldName)
 	-- If they're not not in spawn, they must be in spawn!
         return true
 
+end
+
+function GetSpawnProtection(WorldName)
+	return WORLDSPAWNPROTECTION[WorldName]
 end
