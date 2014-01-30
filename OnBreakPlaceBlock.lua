@@ -33,11 +33,8 @@ function OnPlayerPlacingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX
 	end
 
 	local world = Player:GetWorld():GetName()
-	local xcoord = World:GetSpawnX()
-	local ycoord = World:GetSpawnY()
-	local zcoord = World:GetSpawnZ()
 
-	if IsInSpawn(xcoord, ycoord, zcoord)
+	if IsInSpawn(BlockX, BlockY, BlockZ, world)
 		SendMessageInfo(Player, "Go further from spawn to build")
 		return true
 	end
@@ -59,15 +56,12 @@ function OnPlayerBreakingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, Status
 	end
 
 	local world = Player:GetWorld():GetName()
-	local xcoord = World:GetSpawnX()
-	local ycoord = World:GetSpawnY()
-	local zcoord = World:GetSpawnZ()
 
-	if IsInSpawn(xcoord, ycoord, zcoord)
+	if IsInSpawn(BlockX, BlockY, BlockZ, world)
 		SendMessageInfo(Player, "Go further from spawn to build")
 		return true
 	end
 	
 	return false
-	
+
 end
