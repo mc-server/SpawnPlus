@@ -29,48 +29,46 @@ ALLOWMESSAGETOGGLE = true
 -- Radius to protect in. Set to nil to disable.
 PROTECTIONRADIUS = 10
 
-
 -- Globals
 
 PLUGIN = {}
 LOGPREFIX = ""
-PLAYERLOCATIONS = {}
 WORLDSPAWNPROTECTION = {}
 
 -- Plugin Start
 
 function Initialize( Plugin )
 
-        PLUGIN = Plugin
+	PLUGIN = Plugin
 
-        Plugin:SetName( "SpawnPlus" )
-        Plugin:SetVersion( 1 )
+	Plugin:SetName( "SpawnPlus" )
+	Plugin:SetVersion( 1 )
 
 	LOGPREFIX = "["..Plugin:GetName().."] "
 
 	-- Hooks
-        cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
-        cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
-        cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_PLACING_BLOCK, OnPlayerPlacingBlock)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
+	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_PLACING_BLOCK, OnPlayerPlacingBlock)
 
 	-- Commands
 	if ALLOWMESSAGETOGGLE then
-	        cPluginManager.BindCommand("/togglespawnmessage", "spawnplus.togglemessage", ToggleMessages, " - Toggle the message upon entering and leaving spawn.")
+		cPluginManager.BindCommand("/togglespawnmessage", "spawnplus.togglemessage", ToggleMessages, " - Toggle the message upon entering and leaving spawn.")
 	end
 	
 	-- Load the world spawn protection values fron the INI file.
 	cRoot:Get():ForEachWorld(
-        	function (world)
+		function (world)
 			local WorldIni = cIniFile()
 			WorldIni:ReadFile(world:GetIniFileName())
 			WORLDSPAWNPROTECTION[world:GetName()]   = WorldIni:GetValueSetI("SpawnProtect", "ProtectRadius", 10)
 			WorldIni:WriteFile(world:GetIniFileName())
 		end
-        )
+	)
 
 	LOG( LOGPREFIX .. "Plugin v" .. Plugin:GetVersion() .. " Enabled!" )
-        return true
-        
+	return true
+		
 end
 
 function OnDisable()
@@ -99,19 +97,24 @@ function IsInSpawn(x, y, z, worldName)
 	-- Get protection radius for the world.
 	local protectRadius = GetSpawnProtection(worldName)
 	
+	if protectRadius == nil then
+		-- There is no spawn for this world, so the player can't be in it.
+		return false
+	end
+
 	-- Check if the specified coords are in the spawn.
 	if not ((x <= (spawnx + protectRadius)) and (x >= (spawnx - protectRadius))) then
-                return false -- Not in spawn area.
-        end
-        if not ((y <= (spawny + protectRadius)) and (y >= (spawny - protectRadius))) then 
-                return false -- Not in spawn area.
-        end
-        if not ((z <= (spawnz + protectRadius)) and (z >= (spawnz - protectRadius))) then 
-                return false -- Not in spawn area.
-        end
-        
+		return false -- Not in spawn area.
+	end
+	if not ((y <= (spawny + protectRadius)) and (y >= (spawny - protectRadius))) then 
+		return false -- Not in spawn area.
+	end
+	if not ((z <= (spawnz + protectRadius)) and (z >= (spawnz - protectRadius))) then 
+		return false -- Not in spawn area.
+	end
+		
 	-- If they're not not in spawn, they must be in spawn!
-        return true
+	return true
 
 end
 
