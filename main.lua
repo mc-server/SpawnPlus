@@ -26,7 +26,7 @@
 SPAWNMESSAGE = false
 -- Allow players to toggle entry and exit messages?
 ALLOWMESSAGETOGGLE = true
--- Radius to protect in. Set to nil to disable.
+-- Default radius to protect in. Set to -1 to disable.
 PROTECTIONRADIUS = 10
 
 -- Globals
@@ -41,10 +41,10 @@ function Initialize( Plugin )
 
 	PLUGIN = Plugin
 
-	Plugin:SetName( "SpawnPlus" )
+	Plugin:SetName( "SpawnProtect" )
 	Plugin:SetVersion( 1 )
 
-	LOGPREFIX = "["..Plugin:GetName().."] "
+	LOGPREFIX = "[" .. Plugin:GetName() .. "] "
 
 	-- Hooks
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
@@ -61,7 +61,7 @@ function Initialize( Plugin )
 		function (world)
 			local WorldIni = cIniFile()
 			WorldIni:ReadFile(world:GetIniFileName())
-			WORLDSPAWNPROTECTION[world:GetName()]   = WorldIni:GetValueSetI("SpawnProtect", "ProtectRadius", 10)
+			WORLDSPAWNPROTECTION[world:GetName()] = WorldIni:GetValueSetI("SpawnProtect", "ProtectRadius", PROTECTIONRADIUS)
 			WorldIni:WriteFile(world:GetIniFileName())
 		end
 	)
@@ -76,14 +76,24 @@ function OnDisable()
 end
 
 function ToggleMessages(Split, Player)
-	if MESSAGE[Player:GetName()] == nil or MESSAGE[Player:GetName()] == true then
-		MESSAGE[Player:GetName()] = false
+
+	-- Load message preferences from file.
+	local PlayersIni = IniFile()
+	PlayersIni:ReadFile(PLUGIN:GetLocalFolder() .. "/players.ini")
+	local SendMessages = PlayersIni:GetValueSetB("EntryMessages", Player:GetName(), SPAWNMESSAGE)
+	PlayersIni:WriteFile(PLUGIN:GetLocalFolder() .. "/players.ini")
+
+	if SendMessages == "true" then
+		PlayersIni:SetValueB("EntryMessages", Player:GetName(), false)
 		SendMessageSuccess(Player, "Spawn entry messages disabled!")
 	else
-		MESSAGE[Player:GetName()] = true	
+		PlayersIni:SetValueB("EntryMessages", Player:GetName(), true)	
 		SendMessageSuccess(Player, "Spawn entry messages enabled!")
 	end
+	PlayersIni:WriteFile(PLUGIN:GetLocalFolder() .. "/players.ini")
+
 	return true
+
 end
 
 function IsInSpawn(x, y, z, worldName)
@@ -97,7 +107,7 @@ function IsInSpawn(x, y, z, worldName)
 	-- Get protection radius for the world.
 	local protectRadius = GetSpawnProtection(worldName)
 	
-	if protectRadius == nil then
+	if protectRadius == -1 then
 		-- There is no spawn for this world, so the player can't be in it.
 		return false
 	end

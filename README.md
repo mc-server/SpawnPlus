@@ -17,6 +17,9 @@ Features
  * Notify people when they move into and out of spawn.
  * Block explosions in spawn.
 
+ Disable PvP in spawn.
+ Disable mobs in spawn.
+
 Configuration
 -------------
 
