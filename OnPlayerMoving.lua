@@ -35,13 +35,23 @@ function OnPlayerMoving(Player)
 	if PLAYERLOCATIONS[name] ~= nil then
 		if not IsInSpawn(PLAYERLOCATIONS[name]["x"], PLAYERLOCATIONS[name]["y"], PLAYERLOCATIONS[name]["z"], PLAYERLOCATIONS[name]["world"]) then
 			if IsInSpawn(playerx, playery, playerz, world) then
-				if MESSAGE[Player:GetName()] ~= false then
+				-- Load message preferences from file.
+				local PlayersIni = IniFile()
+				PlayersIni:ReadFile(PLUGIN:GetLocalFolder() .. "/players.ini")
+				local SendMessages = PlayersIni:GetValueSetB("EntryMessages", name, SPAWNMESSAGE)
+
+				if SendMessages ~= false then
 					SendMessage(Player, "You have entered spawn!")
 				end
 			end
 		else
 			if not IsInSpawn(playerx, playery, playerz, world) then
-				if MESSAGE[Player:GetName()] ~= false then
+				-- Load message preferences from file.
+				local PlayersIni = IniFile()
+				PlayersIni:ReadFile(PLUGIN:GetLocalFolder() .. "/players.ini")
+				local SendMessages = PlayersIni:GetValueSetB("EntryMessages", name, SPAWNMESSAGE)
+				
+				if SendMessages ~= false then
 					SendMessage(Player, "You have exited spawn!")
 				end
 			end
